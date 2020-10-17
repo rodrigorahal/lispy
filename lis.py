@@ -1,4 +1,5 @@
 import operator as op
+import functools as fnt
 
 
 def tokenize(chars):
@@ -29,14 +30,14 @@ def atom(token):
 
 def initial_env():
     return {
-        "+": op.add,
-        "add": op.add,
-        "-": op.sub,
-        "subtract": op.sub,
-        "*": op.mul,
-        "multiply": op.mul,
-        "/": op.floordiv,
-        "divide": op.floordiv,
+        "+": lambda *x: fnt.reduce(op.add, x),
+        "add": lambda *x: fnt.reduce(op.add, x),
+        "-": lambda *x: fnt.reduce(op.sub, x),
+        "subtract": lambda *x: fnt.reduce(op.sub, x),
+        "*": lambda *x: fnt.reduce(op.mul, x, 1),
+        "multiply": lambda *x: fnt.reduce(op.mul, x, 1),
+        "/": lambda *x: fnt.reduce(op.floordiv, x[1:], x[0]),
+        "divide": lambda *x: fnt.reduce(op.floordiv, x[1:], x[0]),
     }
 
 
@@ -61,7 +62,7 @@ def eval(exp, env=global_env):
 def repl(prompt="lis.py>> "):
     while True:
         val = eval(parse(input(prompt)))
-        if val:
+        if val is not None:
             print(lispfy(val))
 
 
